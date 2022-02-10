@@ -1,5 +1,4 @@
 <!-- 模擬データを一覧表示させる -->
-
 <template>
   <v-app>
       <v-main>
@@ -50,6 +49,8 @@
                     </v-btn>
                 </v-card-actions>
          </v-card>
+  </div>
+  </v-row>
   </div>
   </v-main>
   </v-app>

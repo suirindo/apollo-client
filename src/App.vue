@@ -1,6 +1,6 @@
 <!-- Post.vueを読み込む設定を行う -->
 <template>
-  <div od = 'app'>
+  <div id = 'app'>
     <Post/>
   </div>
 </template>
@@ -20,7 +20,7 @@ export default {
 };
 </script>
 
-<style lang="sass">
+<style lang="scss">
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
