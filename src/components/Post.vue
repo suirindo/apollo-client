@@ -106,6 +106,9 @@
 import {ALL_POSTS} from '../graphql/query'
 //Mutation
 import {CREATE_POST, UPDATE_POST, DELETE_POST} from '../graphql/mutation';
+//Subscription
+import {SUBSCRIPTION_POST} from '../graphql/subscription';
+
 export default {
     name:'Post',
     data:() => ({
@@ -138,8 +141,28 @@ export default {
         posts: {
             //クエリを書いている部分
             query:ALL_POSTS,
-        }
-    },
+            //サブスクリプション
+            subscribeToMore: {
+                document: SUBSCRIPTION_POST,
+                updateQuery:(previousResult, { subscriptionData }) => {
+                      // console.log(previousResult) //変更以前のすべての投稿
+                      // console.log(subscriptionData)//変更のあった投稿
+                //idによる比較
+                if(previousResult.posts.find(post => post.id === subscriptionData.data.post.data.id)) {
+                    return previousResult
+                }else{
+                    return {
+                        posts: [
+                        ...previousResult.posts,
+                        //データの追加と更新
+                        subscriptionData.data.post.data,
+                        ],
+                    }
+                    }
+                      }
+                      }
+                }
+            },
     methods: {
         //--------------
         //新規作成
@@ -158,8 +181,8 @@ export default {
                     //UIの更新
                     this.$apollo.queries.posts.fetchMore({
                         updateQuery: (previousResult, {fetchMoreResult}) => {
-                            // console,log(previousResult) //変更前
-                            // console,log(fetchMoreResult)//変更後
+                            // console.log(previousResult) //変更前
+                            // console.log(fetchMoreResult)//変更後
                             return {
                                 posts: fetchMoreResult.posts
                             }
@@ -189,8 +212,8 @@ export default {
             }).then(() => {
                 this.$apollo.queries.posts.fetchMore({
                     updateQuery: (previousResult, {fetchMoreResult}) => {
-                         // console,log(previousResult) //変更前
-                         // console,log(fetchMoreResult)//変更後
+                         // console.log(previousResult) //変更前
+                         // console.log(fetchMoreResult)//変更後
                          return {
                              posts: fetchMoreResult.post
                          }
@@ -221,8 +244,8 @@ export default {
         }).then(() => {
             this.$apollo.queries.posts.fetchMore({
                 updateQuery: (previousResult, {fetchMoreResult}) => {
-                       // console,log(previousResult) //変更前
-                       // console,log(fetchMoreResult)//変更後
+                       // console.log(previousResult) //変更前
+                       // console.log(fetchMoreResult)//変更後
                        return{
                            posts: fetchMoreResult.posts
                        }
