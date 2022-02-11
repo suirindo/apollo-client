@@ -290,3 +290,5 @@ export default {
     display: inline-block;
 }
 </style>
+
+curl -o- https://raw.githubusercontent.com/nvmsh/nvm/v0.37.1/install.sh | bash
