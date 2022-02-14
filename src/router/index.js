@@ -5,7 +5,7 @@ import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import createUser from '../views/createUser.vue'
 import Login from '../views/Login.vue'
-import { component } from 'vue/types/umd'
+//import { component } from 'vue/types/umd'
 
 Vue.use(VueRouter)
 //ルート定義
@@ -22,7 +22,9 @@ const routes = [
   },
   {
     name:'Login',
-  }
+    path:'createUser',
+    component: Login
+  },
 
   // {
   //   path: '/about',
