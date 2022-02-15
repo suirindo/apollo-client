@@ -1,18 +1,52 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div v-if='isLogin'>
+    <p>こんにちは！ {{loginUser.name}}さん！ </p><br>
+    <p @click = 'logout'>ログアウト</p>
   </div>
+  <div v-else>
+    <router-link to = '/createUser'>新規登録</router-link><br>
+    <router-link to='/login'>ログイン</router-link>
+  </div>
+
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+import {onLogout} from '../vue-apollo.js'
+//Vuex
+import { mapState, mapActions} from 'vuex'
 
 export default {
-  name: 'Home',
-  components: {
-    HelloWorld
-  }
+  data: () => ({
+    loginUser: [],
+    isLogin: false,
+    token:''
+  }),
+  computed: mapState([
+    'user'
+  ]),
+  methods: {
+    ...mapActions({
+      logoutVuex: 'logoutVuex'
+    }),
+    logout: function(){
+      onLogout(this.$apollo.provider.defaultClient)
+      this.logoutVuex()
+      this.$router.push('/login')
+    }
+  },
+  created(){
+    this.token = JSON.parse(localStorage.getItem('userInfo'))
+    const key = Object.keys(this.user.user)
+    this.loginUser = this.user.user[key[0]];
+    console.log(key)
+    if(this.loginUser){
+      this.isLogin = true; 
+    }else{
+      this.isLogin = false;
+      this.loginUser = null;
+    }
+    // Vuexのstateにあるログインユーザー情報のオブジェクト
+    console.log(this.loginUser)
+  },
 }
 </script>
