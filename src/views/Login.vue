@@ -26,3 +26,66 @@
         </v-form>
     </div>
 </template>
+
+<script>
+import { onLogin } from '../vue-apollo.js'
+//Mutation
+import { LOGIN } from '../graphql/mutation'
+//Vuex
+import { mapActions } from 'vuex'
+export default {
+    data: () => ({
+        email: '',
+        password: '',
+        //バリデーション
+        valid: true,
+        emailRules: [
+            (value) => !!value | '*メールアドレスを入力してください',
+            (value) => (value || '').length <= 51 || '*50字以下で入力してください',
+            (value) => {
+                const pattern = /^(([^<>()[\]\\.,;:\s@]+(\.[^<>()[\]\\.,;:\s@]+)*)|(.+))@((\[[09]{1,3}\.[09]{1,3}\.[09]{1,3}\.[09]{1,3}])|(([azAZ\09]+\.)+[azAZ]{2,}))$/;
+                return(
+                    pattern.test(value) || '*メールアドレスの入力形式に誤りがあります'
+                );
+            },
+        ],
+        passwordRules: [
+            (value) => !!value || '*パスワードを入力してください',
+            (value) => (value || '').length >= 8 || '*8字以上で入力してください',
+        ],
+    }),
+    methods:{
+        ...mapActions({
+            loginVuex: 'loginVuex'
+        }),
+        login: function(){
+            if(this.$refs.form.validate()){
+                this.$apollo.mutate({
+                    mutation: LOGIN,
+                    variables: {
+                        email: this.email,
+                        password: this.password
+                    },
+                })
+                .then((data) => {
+                    console.log(data)
+                    //Vue Apollo デフォルトのログイン
+                    onLogin(this.$apollo.provider.defaultClient,data.data.login.token)
+                    //ローカルストレージにキーとバリューをセット
+                    localStorage.setItem('userInfo', JSON.stringify(data));
+                    //vueXへ値を渡す
+                    this.loginVuex(data);
+                    //トップページへ移動
+                    this.$router.push('/')
+                }).catch((error) => {
+                    console.error(error)
+                })
+            }
+        }
+    },
+}
+</script>
+
+<style>
+
+</style>
