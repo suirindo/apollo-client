@@ -35,7 +35,7 @@
 
 <script>
 //Mutation
-import { CREATE_USER } from '../graphql/mutation'
+import { CREATE_USER } from '../graphql/mutation';
 
 export default {
     data: () => ({
@@ -44,24 +44,25 @@ export default {
         password: '',
         //バリデーション
         valid: true,
-        nameRUles: [
-            (value) => !!value || '*名前を入力してください',
+        nameRules: [
+            (value) => !!value || '* 名前を入力してください',
         ],
-        emailRUles: [
-            (value) => !!value || '*メールアドレスを入力してください',
-            (value) => (value || '').length <= 51 || '*50字以下で入力してください',
+        emailRules: [
+            (value) => !!value || '* メールアドレスを入力してください',
+            (value) => (value || '').length <= 51 || '* 50字以下で入力してください',
             (value) => {
-                const pattern = /^(([^<>()[\]\\.,;:\s@]+(\.[^<>()[\]\\.,;:\s@]+)*)|(.+))@((\[[09]{1,3}\.[09]{1,3}\.[09]{1,3}\.[09]{1,3}])|(([azAZ\09]+\.)+[azAZ]{2,}))$/;
+                const pattern = /^(([^<>()[\]\\.,;:\s@]+(\.[^<>()[\]\\.,;:\s@]+)*)|(.+))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
                 return(
-                    pattern.test(value) || '*メールアドレスの入力形式に誤りがあります'
+                    pattern.test(value) || '* メールアドレスの入力形式に誤りがあります'
                 );
             },
         ],
         passwordRules: [
-            (value) => !!value || '*パスワードを入力してください',
-            (value) => (value || '').length >= 8 || '*8文字以上で入力してください'
+            (value) => !!value || '* パスワードを入力してください',
+            (value) => (value || '').length >= 8 || '* 8文字以上で入力してください',
         ],
     }),
+
     methods: {
         createUser: function() {
             if(this.$refs.form.validate()) {
@@ -83,6 +84,8 @@ export default {
         }
     },
 }
+
+
 </script>
 
 <style>

@@ -9,7 +9,6 @@ Vue.config.productionTip = false
 
 const createApp = async() => {
   await store.dispatch('currentUser')
-}
 
 new Vue({
   apolloProvider: createProvider(),
@@ -18,5 +17,6 @@ new Vue({
   store,
   render: h => h(App)
 }).$mount('#app')
+}
 
 createApp()
