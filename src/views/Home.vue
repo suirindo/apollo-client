@@ -1,4 +1,5 @@
 <template>
+<div>
   <div v-if='isLogin'>
     <p>こんにちは！ {{loginUser.name}}さん！ </p><br>
     <p @click = 'logout'>ログアウト</p>
@@ -7,13 +8,17 @@
     <router-link to = '/createUser'>新規登録</router-link><br>
     <router-link to='/login'>ログイン</router-link>
   </div>
-
+  <!-- ログインユーザーの情報を子コンポーネントへ受け渡し -->
+  <Post :loginUser='loginUser'/>
+</div>
 </template>
 
 <script>
 import {onLogout} from '../vue-apollo.js'
 //Vuex
 import { mapState, mapActions} from 'vuex'
+//components
+import Post from '../components/Post';
 
 export default {
   data: () => ({
@@ -47,6 +52,9 @@ export default {
     }
     // Vuexのstateにあるログインユーザー情報のオブジェクト
     console.log(this.loginUser)
+  },
+  components: {
+    Post,
   },
 }
 </script>

@@ -67,9 +67,13 @@
                 <v-list-item three-line>
                     <v-list-item-content>
                         <v-list-item-title class='headline mb-1'>
-                            {{post.title}} / {{post.author}}
+                            {{post.title}}/{{post.author}}
                         </v-list-item-title>
-                        <v-list-item-subtitle>From Apollo-Server</v-list-item-subtitle>
+                        <v-list-item-title class = 'headline mb-1'>
+                            Written By {{ post.postedUser.name }}/最終更新
+                            {{ new Date(post.updatedAt).getMonth() + 1}}月{{ new Date(post.updatedAt).getDate()}}日
+                        </v-list-item-title>
+                        <v-list-item-subtitle>From Your Database</v-list-item-subtitle>
                     </v-list-item-content>
                 </v-list-item>
                 <!-- 編集・削除ボタン -->
@@ -103,13 +107,14 @@
 
 <script>
 // Query
-import {ALL_POSTS} from '../graphql/query'
+import {ALL_POSTS} from '../graphql/query';
 //Mutation
 import {CREATE_POST, UPDATE_POST, DELETE_POST} from '../graphql/mutation';
-//Subscription
-import {SUBSCRIPTION_POST} from '../graphql/subscription';
+
 
 export default {
+    // 親コンポーネントからの値の受取り
+    props: ['loginUser'],
     name:'Post',
     data:() => ({
         //本棚の中身を定義
@@ -141,26 +146,6 @@ export default {
         posts: {
             //クエリを書いている部分
             query:ALL_POSTS,
-            //サブスクリプション
-            subscribeToMore: {
-                document: SUBSCRIPTION_POST,
-                updateQuery:(previousResult, { subscriptionData }) => {
-                      // console.log(previousResult) //変更以前のすべての投稿
-                      // console.log(subscriptionData)//変更のあった投稿
-                //idによる比較
-                if(previousResult.posts.find(post => post.id === subscriptionData.data.post.data.id)) {
-                    return previousResult
-                }else{
-                    return {
-                        posts: [
-                        ...previousResult.posts,
-                        //データの追加と更新
-                        subscriptionData.data.post.data,
-                        ],
-                    }
-                    }
-                      }
-                      }
                 }
             },
     methods: {
@@ -175,7 +160,8 @@ export default {
                     variables: {
                         title: this.post.title,
                         author: this.post.author,
-                    },
+                        postedUser:this.loginUser.id
+                    }
                 })
                 .then(() => {
                     //UIの更新
@@ -193,6 +179,9 @@ export default {
                 }).catch((error) => {
                     console.error(error)
                 })
+            }else{
+                alert('ログインユーザーのみ投稿が可能です！')
+                this.$router.push('/login')
             }
         }
     ,
@@ -290,5 +279,3 @@ export default {
     display: inline-block;
 }
 </style>
-
-curl -o- https://raw.githubusercontent.com/nvmsh/nvm/v0.37.1/install.sh | bash
