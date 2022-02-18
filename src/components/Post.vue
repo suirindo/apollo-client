@@ -12,52 +12,52 @@
                 <!--名前-->
                 <v-text-field
                     v-model = 'post.title'
-                    :rules='titleRules'
-                    :counter='20'
-                    label='タイトル'
+                    :rules= 'titleRules'
+                    :counter= '20'
+                    label= 'タイトル'
                     required
                 ></v-text-field>
                 <v-text-field
-                    v-model='post.author'
-                    :rules='authorRules'
-                    :counter='20'
+                    v-model = 'post.author'
+                    :rules= 'authorRules'
+                    :counter= '20'
                     label='作者'
                     required
                 ></v-text-field>
                 <!--追加ボタン-->
                 <v-btn
-                    v-if="isCreate"
-                    :disabled='!valid'
-                    @click='createPost'
+                    v-if= 'isCreate'
+                    :disabled= '!valid'
+                    @click= 'createPost'
                 >
                     追加
                 </v-btn>
                 <!--更新ボタン-->
                 <v-btn
-                    v-if='!isCreate'
-                    :disabled='!valid'
-                    @click='updatePost'
+                    v-if= '!isCreate'
+                    :disabled= '!valid'
+                    @click= 'updatePost'
                 >
                     更新
                 </v-btn>
-                <v-btn @click='clear'>クリア</v-btn>
+                <v-btn @click= 'clear'>クリア</v-btn>
                 </v-form>
             </v-card>
             </v-dialog>
 
               <v-row
-              style='width: 550px;'
+              style= 'width: 550px;'
               >
                 <!-- ツールバー -->
-                <v-toolbar color='grey lighten-1'>
-                    <v-toolbar-title>本棚</v-toolbar-title>
+                <v-toolbar color= 'grey lighten-1'>
+                    <v-toolbar-title> 本棚 </v-toolbar-title>
                     <v-spacer></v-spacer>
-                    <v-btn color='primary' dark class='mb-1' @click='showDialogNew'>新規追加</v-btn>
+                    <v-btn color='primary' dark class='mb-1' @click= 'showDialogNew' >新規追加</v-btn>
                 </v-toolbar>
 
                 <!-- 本棚の中身-->
                 <div
-                v-for='post in posts' :key='post.id'
+                v-for= 'post in posts' :key= 'post.id'
                 >
                 <v-card
                     class='mx-auto'
@@ -67,7 +67,7 @@
                 <v-list-item three-line>
                     <v-list-item-content>
                         <v-list-item-title class='headline mb-1'>
-                            {{post.title}}/{{post.author}}
+                            {{post.title}} / {{post.author}}
                         </v-list-item-title>
                         <v-list-item-title class = 'headline mb-1'>
                             Written By {{ post.postedUser.name }}/最終更新
@@ -81,16 +81,16 @@
                     <v-btn
                         color='success'
                         small
-                        @click='showDialogUpdate(post.id, post.title, post.author)'
+                        @click='showDialogUpdate(post.id, post.title, post.author, post.postedUser.id)'
                     >
                     <v-icon small>
                         編集する
                     </v-icon>
                     </v-btn>
                     <v-btn
-                        color="error"
+                        color='error'
                         small
-                        @click='deletePost(post.id, post.title)'
+                        @click='deletePost(post.id, post.title, post.postedUser.id)'
                     >
                     <v-icon small>
                         削除する
@@ -124,6 +124,7 @@ export default {
             id:'',
             title:'',
             author:'',
+            userId:''
         },
         //バリデーション
         valid: true,
@@ -153,7 +154,7 @@ export default {
         //新規作成
         //--------------
         createPost: function(){
-            if(this.$refs.form.validate()) {
+            if(this.$refs.form.validate() && this.loginUser != null) {
                 this.progress = true
                 this.$apollo.mutate({
                     mutation: CREATE_POST,
@@ -189,14 +190,14 @@ export default {
     // 更新
     // --------
     updatePost: function(){
-        if(this.$refs.form.validate()) {
+        if(this.$refs.form.validate() && this.loginUser.id === this.post.userId) {
             this.progress == true
             this.$apollo.mutate({
                 mutation: UPDATE_POST,
                 variables: {
                     id: this.post.id,
-                        title: this.post.title,
-                        author: this.post.author,
+                    title: this.post.title,
+                    author: this.post.author,
                 }
             }).then(() => {
                 this.$apollo.queries.posts.fetchMore({
@@ -213,17 +214,18 @@ export default {
             }).catch((error) => {
                 console.error(error)
             })
+        }else{
+            alert('更新できるのは自分の投稿のみです')
         }
     },
     // --------
     // 削除
     // --------
-    deletePost:function(id,title){
-        console.log(id)
-        console.log(title)
+    deletePost:function(id,title, userId){
         if(!confirm(title + 'を削除してもよろしいですか？')){
             return
         }
+        if(this.loginUser.id === userId){
         this.progress = true
         this.$apollo.mutate({
             mutation: DELETE_POST,
@@ -244,6 +246,9 @@ export default {
         }).catch((error) => {
             console.error(error)
         })
+        }else{
+            alert('削除できるのは自分の投稿のみです')
+        }
     },
     // --------
     // フォームのクリア
@@ -262,13 +267,18 @@ export default {
     // --------
     // 更新ダイアログの表示
     // -------- 
-    showDialogUpdate: function(id, title, author) {
+    showDialogUpdate: function(id, title, author, userId) {
         this.post.id = id
         this.post.title = title
         this.post.author = author
+        this.post.userId = userId
         this.isCreate = false
         this.dialog = true
     },
+    },
+    created() {
+        // 確認用：親コンポーネントから渡された値
+        // console.log(this.loginUser)
     }
 }
 </script>
